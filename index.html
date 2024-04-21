@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Liste de Tâches</title>
+    <link rel="stylesheet" href="allx.css">
+</head>
+<body>
+    <div class="container">
+        <h1>to do list</h1>
+        <form id="taskForm">
+            <input type="text" id="taskInput" placeholder="Ajouter une tâche">
+            <button type="submit">Ajouter</button>
+        </form>
+        <ul id="taskList"></ul>
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script>
+$(document).ready(function() {
+    loadTasks();
+
+    
+    $('#taskForm').submit(function(event) {
+        event.preventDefault(); 
+
+        const taskInput = $('#taskInput').val();
+        if (taskInput.trim() !== '') {
+            addTask(taskInput);
+            $('#taskInput').val(''); 
+        }
+    });
+
+    $('#taskList').on('click', '.delete-btn', function() {
+        const index = $(this).parent().index();
+        removeTask(index);
+    });
+
+    $('#taskList').on('change', '.complete-checkbox', function() {
+        const index = $(this).parent().index();
+        toggleTaskCompleted(index);
+    });
+
+    function loadTasks() {
+        const tasks = JSON.parse(localStorage.getItem('tasks')) || [];
+        tasks.forEach(function(task) {
+            $('#taskList').append(`<li>${task.text}<button class="delete-btn">Supprimer</button><input type="checkbox" class="complete-checkbox" ${task.completed ? 'checked' : ''}></li>`);
+        });
+    }
+
+    function addTask(text) {
+        const task = { text: text, completed: false };
+        const tasks = JSON.parse(localStorage.getItem('tasks')) || [];
+        tasks.push(task);
+        localStorage.setItem('tasks', JSON.stringify(tasks));
+        $('#taskList').append(`<li>${text}<button class="delete-btn">Supprimer</button><input type="checkbox" class="complete-checkbox"></li>`);
+    }
+
+    function removeTask(index) {
+        const tasks = JSON.parse(localStorage.getItem('tasks')) || [];
+        tasks.splice(index, 1);
+        localStorage.setItem('tasks', JSON.stringify(tasks));
+        $('#taskList li').eq(index).remove();
+    }
+
+    function toggleTaskCompleted(index) {
+        const tasks = JSON.parse(localStorage.getItem('tasks')) || [];
+        tasks[index].completed = !tasks[index].completed;
+        localStorage.setItem('tasks', JSON.stringify(tasks));
+        $('#taskList li').eq(index).toggleClass('completed');
+    }
+});
+
+    </script>
+</body>
+</html>
